@@ -1,0 +1,1 @@
+- [MCA project scope](smart-lost-found-scope.md) — keep the eight matching concepts explainable and the Python rule-based fallback usable without paid AI.

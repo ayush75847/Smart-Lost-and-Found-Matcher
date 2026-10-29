@@ -1,22 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
+  # Do not change the title; generated import paths depend on it.
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Smart Lost & Found Matcher API
 servers:
   - url: /api
-    description: Base API path
+    description: Shared API service
 tags:
   - name: health
-    description: Health operations
+  - name: auth
+  - name: items
+  - name: matching
+  - name: claims
+  - name: experiments
+  - name: dashboard
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
-      summary: Health check
-      description: Returns server health status
+      summary: Check API health
       responses:
         "200":
           description: Healthy
@@ -24,13 +28,671 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Create a user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistration"
+      responses:
+        "201":
+          description: Account created and signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "409":
+          description: Username already exists
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "401":
+          description: Invalid credentials
+  /auth/me:
+    get:
+      operationId: getSession
+      tags: [auth]
+      summary: Get the current session
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Current user or null when signed out
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/User"
+                  - type: "null"
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Sign out
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Signed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get report and matching totals
+      responses:
+        "200":
+          description: Dashboard summary computed from stored reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+  /items:
+    get:
+      operationId: listItems
+      tags: [items]
+      summary: Search and page through reports
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: type
+          schema: { type: string, enum: [lost, found] }
+        - in: query
+          name: status
+          schema: { type: string, enum: [active, resolved] }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, maximum: 50, default: 10 }
+      responses:
+        "200":
+          description: Matching reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ItemPage"
+  /items/lost:
+    post:
+      operationId: createLostItem
+      tags: [items]
+      summary: Report a lost item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LostItemInput"
+      responses:
+        "201":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+  /items/found:
+    post:
+      operationId: createFoundItem
+      tags: [items]
+      summary: Report a found item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FoundItemInput"
+      responses:
+        "201":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+  /items/{itemId}:
+    get:
+      operationId: getItem
+      tags: [items]
+      summary: Get one public item report
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Report details without private verification features
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+        "404":
+          description: Report not found
+  /match/brute-force:
+    post:
+      operationId: runBruteForce
+      tags: [matching]
+      summary: Exhaustively evaluate every found report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchRequest"
+      responses:
+        "200":
+          description: Brute-force results and actual measurements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlgorithmRun"
+  /match/heuristic:
+    post:
+      operationId: runHeuristic
+      tags: [matching]
+      summary: Evaluate candidates after heuristic filtering
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchRequest"
+      responses:
+        "200":
+          description: Heuristic results and actual measurements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlgorithmRun"
+  /match/compare:
+    post:
+      operationId: compareAlgorithms
+      tags: [matching]
+      summary: Compare both algorithms on the same reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchRequest"
+      responses:
+        "200":
+          description: Side-by-side algorithm results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompareResponse"
+  /ai/analyze:
+    post:
+      operationId: analyzeDescription
+      tags: [matching]
+      summary: Extract item attributes using deterministic rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeInput"
+      responses:
+        "200":
+          description: Extracted attributes and method
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeResult"
+  /claims:
+    get:
+      operationId: listClaims
+      tags: [claims]
+      summary: List the current user's claims or admin review queue
+      security:
+        - SessionCookie: []
+      responses:
+        "200":
+          description: Claims visible to the current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Claim"
+        "401":
+          description: Sign in required
+    post:
+      operationId: createClaim
+      tags: [claims]
+      summary: Submit an ownership claim
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimInput"
+      responses:
+        "201":
+          description: Claim submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Claim"
+        "401":
+          description: Sign in required
+  /claims/{claimId}:
+    patch:
+      operationId: reviewClaim
+      tags: [claims]
+      summary: Approve or reject a claim as an administrator
+      security:
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: claimId
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimReviewInput"
+      responses:
+        "200":
+          description: Claim reviewed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Claim"
+        "403":
+          description: Administrator role required
+        "409":
+          description: A report is no longer available
+  /experiments/datasets:
+    get:
+      operationId: listExperimentDatasets
+      tags: [experiments]
+      summary: List reproducible isolated demo datasets
+      responses:
+        "200":
+          description: Available experiment datasets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DatasetInfo" }
+  /experiments/generate:
+    post:
+      operationId: generateExperimentDataset
+      tags: [experiments]
+      summary: Generate an isolated synthetic dataset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateDatasetInput"
+      responses:
+        "200":
+          description: Reproducible synthetic dataset descriptor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatasetInfo"
+  /experiments/run:
+    post:
+      operationId: runExperiment
+      tags: [experiments]
+      summary: Compare algorithms and return chart-ready measurements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExperimentInput"
+      responses:
+        "200":
+          description: Experiment output measured by the Python algorithms
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompareResponse"
 components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+      required: [status]
+    Message:
+      type: object
+      properties:
+        message: { type: string }
+      required: [message]
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        role: { type: string, enum: [user, admin] }
+      required: [id, username, role]
+    UserRegistration:
+      type: object
+      properties:
+        username: { type: string, minLength: 3, maxLength: 80 }
+        password: { type: string, minLength: 10, maxLength: 128 }
+      required: [username, password]
+    LoginInput:
+      type: object
+      properties:
+        username: { type: string }
+        password: { type: string }
+      required: [username, password]
+    SessionResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+      required: [user]
+    Item:
+      type: object
+      properties:
+        id: { type: integer }
+        type: { type: string, enum: [lost, found] }
+        name: { type: string }
+        category: { type: string }
+        brand: { type: ["string", "null"] }
+        color: { type: ["string", "null"] }
+        description: { type: string }
+        location: { type: string }
+        reportDate: { type: string, format: date }
+        status: { type: string, enum: [active, resolved] }
+        createdAt: { type: string, format: date-time }
+        ownerId: { type: ["integer", "null"] }
+      required: [id, type, name, category, brand, color, description, location, reportDate, status, createdAt, ownerId]
+    LostItemInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        category: { type: string, minLength: 1, maxLength: 80 }
+        brand: { type: ["string", "null"], maxLength: 120 }
+        color: { type: ["string", "null"], maxLength: 80 }
+        description: { type: string, minLength: 1, maxLength: 2000 }
+        location: { type: string, minLength: 1, maxLength: 200 }
+        reportDate: { type: string, format: date }
+        identifyingFeatures: { type: ["string", "null"], maxLength: 1000 }
+      required: [name, category, description, location, reportDate]
+    FoundItemInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        category: { type: string, minLength: 1, maxLength: 80 }
+        brand: { type: ["string", "null"], maxLength: 120 }
+        color: { type: ["string", "null"], maxLength: 80 }
+        description: { type: string, minLength: 1, maxLength: 2000 }
+        location: { type: string, minLength: 1, maxLength: 200 }
+        reportDate: { type: string, format: date }
+        privateIdentifyingFeatures: { type: ["string", "null"], maxLength: 1000 }
+      required: [name, category, description, location, reportDate]
+    ItemPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Item"
+        total: { type: integer }
+        page: { type: integer }
+        pageSize: { type: integer }
+        pageCount: { type: integer }
+        categories:
+          type: array
+          items: { type: string }
+      required: [items, total, page, pageSize, pageCount, categories]
+    CategoryCount:
+      type: object
+      properties:
+        category: { type: string }
+        lost: { type: integer }
+        found: { type: integer }
+      required: [category, lost, found]
+    DashboardStats:
+      type: object
+      properties:
+        totalLost: { type: integer }
+        totalFound: { type: integer }
+        activeReports: { type: integer }
+        potentialMatches: { type: integer }
+        resolvedReports: { type: integer }
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryCount"
+        recentReports:
+          type: array
+          items:
+            $ref: "#/components/schemas/Item"
+      required: [totalLost, totalFound, activeReports, potentialMatches, resolvedReports, categories, recentReports]
+    MatchRequest:
+      type: object
+      properties:
+        lostItemId: { type: ["integer", "null"] }
+        datasetId: { type: ["string", "null"] }
+        topK: { type: integer, minimum: 1, maximum: 20, default: 5 }
+        threshold: { type: number, minimum: 0, maximum: 100, default: 40 }
+        dateToleranceDays: { type: integer, minimum: 0, maximum: 30, default: 1 }
+        weights:
+          type: object
+          additionalProperties: { type: number, minimum: 0 }
+        strictCategoryFilter: { type: boolean, default: true }
+        locationDateFilter: { type: boolean, default: false }
+      required: [topK, threshold, dateToleranceDays, strictCategoryFilter, locationDateFilter]
+    ScorePart:
+      type: object
+      properties:
+        attribute: { type: string }
+        label: { type: string }
+        weight: { type: number }
+        similarity: { type: ["number", "null"] }
+        contribution: { type: ["number", "null"] }
+        available: { type: boolean }
+        explanation: { type: string }
+      required: [attribute, label, weight, similarity, contribution, available, explanation]
+    SetComparison:
+      type: object
+      properties:
+        setA: { type: array, items: { type: string } }
+        setB: { type: array, items: { type: string } }
+        intersection: { type: array, items: { type: string } }
+        union: { type: array, items: { type: string } }
+        similarity: { type: ["number", "null"] }
+      required: [setA, setB, intersection, union, similarity]
+    MatchRecommendation:
+      type: object
+      properties:
+        item:
+          $ref: "#/components/schemas/Item"
+        score: { type: number, minimum: 0, maximum: 100 }
+        evidenceCoverage: { type: number, minimum: 0, maximum: 100 }
+        grade: { type: string }
+        matchingAttributes: { type: array, items: { type: string } }
+        differingAttributes: { type: array, items: { type: string } }
+        explanation: { type: string }
+        breakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScorePart"
+        jaccard:
+          $ref: "#/components/schemas/SetComparison"
+      required: [item, score, evidenceCoverage, grade, matchingAttributes, differingAttributes, explanation, breakdown, jaccard]
+    DecisionStep:
+      type: object
+      properties:
+        step: { type: string }
+        status: { type: string, enum: [passed, filtered, skipped, completed] }
+        detail: { type: string }
+        count: { type: ["integer", "null"] }
+      required: [step, status, detail, count]
+    InvariantCheck:
+      type: object
+      properties:
+        invariant: { type: string }
+        passed: { type: boolean }
+        detail: { type: string }
+      required: [invariant, passed, detail]
+    AlgorithmRun:
+      type: object
+      properties:
+        algorithm: { type: string, enum: [brute_force, heuristic] }
+        totalCandidates: { type: integer }
+        evaluatedCandidates: { type: integer }
+        similarityCalculations: { type: integer }
+        executionTimeMs: { type: number }
+        highestScore: { type: ["number", "null"] }
+        averageScore: { type: ["number", "null"] }
+        candidateReductionPercentage: { type: ["number", "null"] }
+        recommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchRecommendation"
+        decisionTree:
+          type: array
+          items:
+            $ref: "#/components/schemas/DecisionStep"
+        invariantChecks:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvariantCheck"
+        categoryDistribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryCount"
+        datasetName: { type: string }
+        precision: { type: ["number", "null"] }
+        recall: { type: ["number", "null"] }
+        labeledPairCount: { type: integer }
+      required: [algorithm, totalCandidates, evaluatedCandidates, similarityCalculations, executionTimeMs, highestScore, averageScore, candidateReductionPercentage, recommendations, decisionTree, invariantChecks, categoryDistribution, datasetName, precision, recall, labeledPairCount]
+    CompareResponse:
+      type: object
+      properties:
+        bruteForce:
+          $ref: "#/components/schemas/AlgorithmRun"
+        heuristic:
+          $ref: "#/components/schemas/AlgorithmRun"
+        candidateReductionPercentage: { type: ["number", "null"] }
+        groundTruthAvailable: { type: boolean }
+        methodology: { type: string }
+      required: [bruteForce, heuristic, candidateReductionPercentage, groundTruthAvailable, methodology]
+    AnalyzeInput:
+      type: object
+      properties:
+        description: { type: string, minLength: 1, maxLength: 2000 }
+      required: [description]
+    ExtractedAttributes:
+      type: object
+      properties:
+        itemName: { type: ["string", "null"] }
+        category: { type: ["string", "null"] }
+        color: { type: ["string", "null"] }
+        material: { type: ["string", "null"] }
+        brand: { type: ["string", "null"] }
+        location: { type: ["string", "null"] }
+      required: [itemName, category, color, material, brand, location]
+    AnalyzeResult:
+      type: object
+      properties:
+        source: { type: string, enum: [deterministic_rules] }
+        attributes:
+          $ref: "#/components/schemas/ExtractedAttributes"
+        confidenceNotes: { type: array, items: { type: string } }
+      required: [source, attributes, confidenceNotes]
+    ClaimInput:
+      type: object
+      properties:
+        lostItemId: { type: integer }
+        foundItemId: { type: integer }
+        ownershipEvidence: { type: string, minLength: 10, maxLength: 2000 }
+      required: [lostItemId, foundItemId, ownershipEvidence]
+    ClaimReviewInput:
+      type: object
+      properties:
+        decision: { type: string, enum: [approved, rejected] }
+        reviewNote: { type: ["string", "null"], maxLength: 1000 }
+      required: [decision]
+    Claim:
+      type: object
+      properties:
+        id: { type: integer }
+        lostItem:
+          $ref: "#/components/schemas/Item"
+        foundItem:
+          $ref: "#/components/schemas/Item"
+        claimant:
+          $ref: "#/components/schemas/User"
+        ownershipEvidence: { type: string }
+        status: { type: string, enum: [pending, approved, rejected] }
+        reviewNote: { type: ["string", "null"] }
+        privateFeatureForReview: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        reviewedAt: { type: ["string", "null"], format: date-time }
+      required: [id, lostItem, foundItem, claimant, ownershipEvidence, status, reviewNote, privateFeatureForReview, createdAt, reviewedAt]
+    DatasetInfo:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        reportCount: { type: integer }
+        lostCount: { type: integer }
+        foundCount: { type: integer }
+        hasGroundTruth: { type: boolean }
+        isSynthetic: { type: boolean }
+      required: [id, name, description, reportCount, lostCount, foundCount, hasGroundTruth, isSynthetic]
+    GenerateDatasetInput:
+      type: object
+      properties:
+        reportCount: { type: integer, enum: [100, 500, 1000] }
+        seed: { type: integer, minimum: 0, maximum: 2147483647, default: 42 }
+      required: [reportCount, seed]
+    ExperimentInput:
+      allOf:
+        - $ref: "#/components/schemas/MatchRequest"
+      properties:
+        datasetId: { type: string }
+        lostItemId: { type: ["integer", "null"] }
+        reportCount: { type: ["integer", "null"], enum: [100, 500, 1000, null] }
+        seed: { type: integer, minimum: 0, maximum: 2147483647, default: 42 }
+      required: [datasetId, seed]

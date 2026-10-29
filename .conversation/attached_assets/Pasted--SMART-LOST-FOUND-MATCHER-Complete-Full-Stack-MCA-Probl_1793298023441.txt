@@ -1,0 +1,1312 @@
+# SMART LOST & FOUND MATCHER
+
+## Complete Full-Stack MCA Problem Solving Project
+
+You are an expert Python developer, React developer, algorithm designer, and UI/UX engineer.
+
+Build a complete, fully functional, professional web application named **Smart Lost & Found Matcher**.
+
+This is an academic project for the subject **Problem Solving**, so the mathematical algorithms and their graphical demonstrations are the most important parts.
+
+The application must demonstrate how mathematical reasoning, heuristic techniques, set theory, optimization, and prompt-based AI can solve the real-world problem of matching lost items with found items.
+
+**The final application must be simple, visually impressive, mathematically correct, and fully functional.**
+
+Do not build a static prototype. Implement actual backend algorithms, persistent storage, working APIs, interactive graphs, and automated tests.
+
+---
+
+# 1. MANDATORY TECHNOLOGY STACK
+
+### Frontend
+
+* React.js with Vite
+* Tailwind CSS
+* React Router
+* Recharts for interactive charts
+* Lucide React for icons
+
+### Backend
+
+* Python 3.11+
+* FastAPI
+* Pydantic
+* Uvicorn
+
+### Database
+
+* SQLite
+* SQLAlchemy ORM
+
+### Mathematical Algorithms
+
+Implement all matching algorithms in Python.
+
+Use Python's standard libraries wherever possible, including:
+
+* `math`
+* `itertools`
+* `collections`
+* `heapq`
+* `re`
+* `time`
+
+### Visualization
+
+* Recharts for frontend graphs
+* Graphviz or React Flow for matching decision trees
+* Matplotlib only if needed for experimental graphs
+
+### Testing
+
+* Pytest
+* FastAPI TestClient
+
+### AI
+
+* Optional LLM API integration
+* Mandatory Python-based rule-driven fallback
+
+**Important:** The entire application must work without requiring a paid API key.
+
+Do not use Node.js or Express for backend business logic. Node.js is permitted only for the React/Vite development tooling.
+
+---
+
+# 2. PROJECT OBJECTIVE
+
+Create a Lost & Found platform where users can:
+
+1. Report lost items.
+2. Report found items.
+3. Browse and search existing reports.
+4. Automatically identify potential matches.
+5. View mathematical similarity scores.
+6. Understand why two items matched.
+7. Compare brute-force and heuristic algorithms.
+8. Visualize matching algorithms using graphs.
+9. Submit ownership claims.
+10. Verify claims and resolve reports.
+11. Experiment with different datasets.
+12. Analyze algorithm performance.
+
+The application must demonstrate **eight mandatory syllabus topics through real working implementations**.
+
+---
+
+# 3. EIGHT MANDATORY PROBLEM-SOLVING TOPICS
+
+The following topics must be implemented.
+
+| No. | Topic                        | Implementation                                                   |
+| --- | ---------------------------- | ---------------------------------------------------------------- |
+| 1   | Pattern Recognition          | Identify similar item attributes                                 |
+| 2   | Heuristic Reasoning          | Calculate weighted similarity scores                             |
+| 3   | Set Theory                   | Implement Jaccard similarity                                     |
+| 4   | Brute Force vs. Heuristic    | Compare exhaustive and optimized candidate searches              |
+| 5   | Conditional Statements       | Apply matching eligibility rules                                 |
+| 6   | Extreme Principle            | Find maximum scores and Top-K matches                            |
+| 7   | Invariants                   | Enforce matching and verification constraints                    |
+| 8   | Prompt-Based Problem Solving | Extract structured attributes from natural-language descriptions |
+
+These topics must not merely appear as labels.
+
+Every topic must have:
+
+* A working Python implementation.
+* A clear explanation.
+* At least one example.
+* Relevant mathematical calculations.
+* Automated tests.
+* A visible demonstration in the application.
+
+---
+
+# 4. APPLICATION PAGES
+
+Build a professional React application with the following pages.
+
+## Page 1: Dashboard
+
+Display:
+
+* Total lost reports
+* Total found reports
+* Active reports
+* Potential matches
+* Successfully resolved reports
+* Recent reports
+* Category distribution chart
+* Matching activity summary
+
+Use attractive statistic cards and responsive graphs.
+
+## Page 2: Report Lost Item
+
+Create a working form containing:
+
+* Item name
+* Category
+* Brand
+* Color
+* Description
+* Last known location
+* Date lost
+* Unique identifying features
+
+Validate all required fields.
+
+Save reports permanently in SQLite.
+
+## Page 3: Report Found Item
+
+Create a similar form for found items.
+
+Include:
+
+* Item name
+* Category
+* Brand
+* Color
+* Description
+* Found location
+* Date found
+* Private identifying features
+
+After submission, the system should be able to identify potential matches.
+
+## Page 4: Browse Reports
+
+Display all reports.
+
+Include:
+
+* Search
+* Category filtering
+* Lost/found filtering
+* Status filtering
+* Item details
+* Pagination
+
+## Page 5: Smart Matcher
+
+Allow the user to select a lost report.
+
+The backend must calculate and return potential matching found reports.
+
+Display:
+
+* Top five matching items
+* Similarity percentage
+* Matching attributes
+* Differing attributes
+* Matching explanation
+* Detailed mathematical score breakdown
+
+Add a button called **Explain This Match**.
+
+The explanation must use actual algorithm calculations.
+
+## Page 6: Algorithm Lab
+
+This is the most important page for academic evaluation.
+
+Provide:
+
+* Dataset selection
+* Algorithm selection
+* Brute-force execution
+* Heuristic execution
+* Side-by-side comparison
+* Mathematical calculations
+* Interactive graphs
+* Search-tree visualization
+* Performance metrics
+
+## Page 7: Syllabus Concepts
+
+Explain how each of the eight syllabus topics contributes to the application.
+
+Include small interactive demonstrations wherever practical.
+
+---
+
+# 5. DATABASE DESIGN
+
+Create the necessary SQLite tables.
+
+### Item Reports
+
+```python
+{
+    "id": 1,
+    "type": "lost",
+    "name": "Wallet",
+    "category": "Accessories",
+    "brand": "Wildcraft",
+    "color": "Black",
+    "description": "Black leather wallet",
+    "location": "College Library",
+    "date": "2026-10-25",
+    "identifying_features": "Scratch near zipper",
+    "status": "active"
+}
+```
+
+Additional tables:
+
+* Users
+* Ownership claims
+* Claim verification history
+
+Use appropriate database relationships and constraints.
+
+Private identifying features must not be exposed in public API responses.
+
+Use a simple authentication system with secure password hashing and role-based authorization.
+
+Roles:
+
+* User
+* Admin
+
+Provide clearly documented demo accounts for testing.
+
+---
+
+# 6. TOPIC 1: PATTERN RECOGNITION
+
+Implement Python functions that recognize similarities between item reports.
+
+Compare:
+
+* Item name
+* Category
+* Color
+* Brand
+* Location
+* Date
+* Description
+
+### Example
+
+Lost report:
+
+"Lost black leather wallet near library."
+
+Found report:
+
+"Found dark wallet outside college library."
+
+The system should identify:
+
+* Wallet matches wallet.
+* Black is related to dark.
+* Library locations are similar.
+
+Implement:
+
+* Case-insensitive comparison
+* Text normalization
+* Whitespace removal
+* Keyword extraction
+* Basic synonym recognition
+* Simple fuzzy matching where appropriate
+
+Keep the implementation understandable.
+
+Display recognized patterns in the Smart Matcher.
+
+---
+
+# 7. TOPIC 2: SET THEORY
+
+Implement Jaccard Similarity using actual Python sets.
+
+### Formula
+
+J(A, B) = |A ∩ B| / |A ∪ B|
+
+Example:
+
+A = {black, leather, wallet, zipper}
+
+B = {black, leather, wallet, small}
+
+Intersection:
+
+A ∩ B = {black, leather, wallet}
+
+Union:
+
+A ∪ B = {black, leather, wallet, zipper, small}
+
+Therefore:
+
+J(A, B) = 3/5 = 0.60
+
+### Implementation
+
+Create a reusable Python function:
+
+`jaccard_similarity(set_a, set_b)`
+
+Requirements:
+
+* Handle empty sets.
+* Remove irrelevant stopwords.
+* Normalize text.
+* Return similarity between 0 and 1.
+* Display intersection and union.
+
+When both sets are empty, treat similarity as unavailable rather than automatically assigning 100%.
+
+### Visualization
+
+Create an interactive set comparison panel.
+
+Display:
+
+* Attributes unique to A
+* Common attributes
+* Attributes unique to B
+* Jaccard similarity percentage
+
+Use a Venn-style diagram or clearly separated set visualization.
+
+---
+
+# 8. TOPIC 3: HEURISTIC REASONING
+
+Implement a weighted similarity scoring algorithm.
+
+### Default Weights
+
+| Attribute   | Weight |
+| ----------- | -----: |
+| Category    |    25% |
+| Item Name   |    20% |
+| Color       |    15% |
+| Brand       |    10% |
+| Location    |    15% |
+| Date        |     5% |
+| Description |    10% |
+
+Total = 100%.
+
+### Mathematical Formula
+
+S = 0.25C + 0.20N + 0.15Co + 0.10B + 0.15L + 0.05D + 0.10T
+
+Where:
+
+* C = Category similarity
+* N = Name similarity
+* Co = Color similarity
+* B = Brand similarity
+* L = Location similarity
+* D = Date compatibility
+* T = Description similarity
+
+Each attribute similarity lies between 0 and 1.
+
+Final matching score:
+
+Score = S × 100
+
+### Requirements
+
+Implement the actual formula in Python.
+
+Allow users to adjust weights in the Algorithm Lab.
+
+Normalize weights when necessary.
+
+Handle missing attributes consistently.
+
+For missing optional attributes, exclude unavailable comparisons from the weighted average and renormalize the remaining weights. Display the percentage of total attribute weight for which evidence was available.
+
+This prevents missing information from being mistaken for a confirmed mismatch.
+
+### Score Interpretation
+
+* 85–100: Strong similarity
+* 65–84: Moderate similarity
+* 40–64: Weak similarity
+* Below 40: Low similarity
+
+These are heuristic similarity categories, not verified probabilities of ownership.
+
+### Graphical Representation
+
+Display a bar chart showing the contribution of every attribute.
+
+Show the complete score calculation.
+
+---
+
+# 9. TOPIC 4: BRUTE FORCE VS. HEURISTIC APPROACHES
+
+Implement two independent candidate-search algorithms.
+
+## Algorithm A: Brute Force
+
+For a selected lost report:
+
+1. Retrieve all found reports.
+2. Apply mandatory validity checks.
+3. Calculate similarity for every eligible candidate.
+4. Rank all candidates.
+5. Return the Top-K matches.
+
+Do not use optional category or location prefiltering.
+
+This is an exhaustive candidate-search baseline.
+
+## Algorithm B: Optimized Heuristic Search
+
+For the same lost report:
+
+1. Retrieve active found reports.
+2. Apply category-based filtering.
+3. Use relevant location and date compatibility checks.
+4. Calculate similarity scores.
+5. Rank candidates.
+6. Return Top-K matches.
+
+Allow users to disable strict filters or broaden the search.
+
+### Fair Comparison
+
+Both algorithms must use the same weighted similarity formula.
+
+The primary difference should be the number of candidates evaluated.
+
+### Performance Metrics
+
+Calculate:
+
+* Total candidate reports
+* Candidates evaluated
+* Similarity calculations
+* Execution time
+* Highest score
+* Number of recommendations
+* Candidate reduction percentage
+
+### Formula
+
+Reduction (%) = ((B - H) / B) × 100
+
+Where:
+
+* B = Brute-force similarity comparisons
+* H = Heuristic similarity comparisons
+
+Handle B = 0 safely.
+
+### Important
+
+Do not fabricate execution times.
+
+Use Python's `time.perf_counter()`.
+
+For benchmarks:
+
+* Use identical datasets.
+* Perform warm-up runs.
+* Repeat measurements.
+* Report median execution time.
+* Explain that optimized filtering may miss relevant candidates.
+
+### Graphs
+
+Create:
+
+1. Execution time comparison.
+2. Candidate comparison count.
+3. Candidate reduction percentage.
+4. Highest matching score comparison.
+
+---
+
+# 10. TOPIC 5: CONDITIONAL STATEMENTS
+
+Implement explicit matching rules.
+
+A valid candidate must satisfy:
+
+1. The selected report must be a lost report.
+2. The candidate must be a found report.
+3. Both reports must be active.
+4. Reports must have different IDs.
+5. Date compatibility must be evaluated.
+
+Example:
+
+```python
+def is_valid_candidate(lost_item, found_item):
+    if lost_item.id == found_item.id:
+        return False
+
+    if lost_item.type != "lost":
+        return False
+
+    if found_item.type != "found":
+        return False
+
+    if lost_item.status != "active":
+        return False
+
+    if found_item.status != "active":
+        return False
+
+    return True
+```
+
+Extend this function with date validation.
+
+If the found date is earlier than the lost date, flag the inconsistency.
+
+Use a configurable tolerance for uncertain dates, rather than silently accepting impossible timelines.
+
+### Visualization
+
+Display a condition-check panel.
+
+Example:
+
+* Correct report types: Passed
+* Both reports active: Passed
+* Different IDs: Passed
+* Date compatibility: Passed
+* Category similarity: High
+
+Display meaningful reasons when a candidate is rejected.
+
+---
+
+# 11. TOPIC 6: EXTREME PRINCIPLE
+
+Implement maximum-score selection and Top-K ranking.
+
+Example:
+
+Scores = [65, 89, 72, 96, 81]
+
+Maximum = 96
+
+For K = 3:
+
+Top-K = [96, 89, 81]
+
+### Requirements
+
+Implement:
+
+* Maximum score selection
+* Descending sorting
+* Top-K recommendations
+* Deterministic tie-breaking
+
+Use the report ID as the final tie-breaker.
+
+### Visualization
+
+Create a horizontal bar chart showing the highest-ranked candidates.
+
+Highlight the best match.
+
+Explain how selecting an extreme value supports the optimization objective.
+
+---
+
+# 12. TOPIC 7: INVARIANTS
+
+Implement rules that must always remain true.
+
+### Mandatory Invariants
+
+1. A report cannot match itself.
+2. Lost reports can only match found reports.
+3. Resolved reports cannot enter new active matching operations.
+4. Similarity scores must remain between 0 and 100.
+5. Only authorized users can approve ownership claims.
+6. A resolved item cannot be resolved again.
+7. An approved claim must reference valid reports.
+8. A report cannot participate in conflicting approved claims.
+
+Enforce these rules in the backend.
+
+Use database transactions when approving claims.
+
+### Algorithm Lab
+
+Add an Invariant Verification panel.
+
+Show which invariants were checked during the latest operation.
+
+Use actual backend validation results.
+
+---
+
+# 13. TOPIC 8: PROMPT-BASED PROBLEM SOLVING
+
+Implement AI-assisted description analysis.
+
+### Example Input
+
+"Lost my dark-colored leather wallet near the college library."
+
+### Structured Output
+
+```json
+{
+  "item_name": "wallet",
+  "category": "Accessories",
+  "color": "dark",
+  "material": "leather",
+  "location": "college library"
+}
+```
+
+### Implementation
+
+When an LLM API key is available:
+
+1. Send the description to the Python backend.
+2. Use a carefully designed extraction prompt.
+3. Request structured JSON.
+4. Validate the returned JSON using Pydantic.
+5. Display extracted attributes.
+6. Allow users to correct the results.
+
+Do not invent missing attributes.
+
+### Fallback Mode
+
+If no API key is configured, implement rule-based extraction using:
+
+* Python regular expressions
+* Keyword dictionaries
+* Synonym mappings
+* Text normalization
+
+The application must work in fallback mode.
+
+Clearly label whether results were generated by an LLM or deterministic rules.
+
+### Security
+
+Never expose API keys.
+
+Do not send private verification answers to the AI.
+
+Do not allow user descriptions to override system instructions.
+
+---
+
+# 14. OWNERSHIP VERIFICATION SYSTEM
+
+Implement a simple claim-verification workflow.
+
+### Workflow
+
+Potential Match
+→ Submit Claim
+→ Pending Verification
+→ Admin Review
+→ Approved or Rejected
+→ Resolved if approved
+
+Users can submit claims.
+
+Admins can approve or reject claims.
+
+On approval:
+
+* Update the lost report status.
+* Update the found report status.
+* Record the approved claim.
+* Prevent conflicting approvals.
+
+Use database transactions.
+
+Private identifying features must remain hidden from unauthorized users.
+
+---
+
+# 15. ALGORITHM LAB — GRAPHICAL REPRESENTATIONS
+
+Create an interactive page named:
+
+**Problem Solving & Algorithm Analysis Lab**
+
+It must contain the following sections.
+
+## Section A: Dataset Selection
+
+Allow users to:
+
+* Select a demo dataset.
+* Generate synthetic datasets.
+* Choose a lost report.
+* Adjust similarity weights.
+* Configure Top-K.
+
+## Section B: Algorithm Execution
+
+Provide buttons:
+
+**Run Brute Force**
+
+**Run Heuristic**
+
+**Compare Both Algorithms**
+
+Each button must execute the corresponding Python backend function.
+
+## Section C: Mathematical Calculations
+
+Display:
+
+* Jaccard similarity
+* Set intersection
+* Set union
+* Weighted heuristic formula
+* Individual attribute scores
+* Final matching score
+
+## Section D: Algorithm Comparison
+
+Display a table:
+
+| Metric                | Brute Force | Heuristic  |
+| --------------------- | ----------- | ---------- |
+| Candidate Comparisons | Actual      | Actual     |
+| Execution Time        | Actual      | Actual     |
+| Highest Score         | Actual      | Actual     |
+| Matches Returned      | Actual      | Actual     |
+| Candidate Reduction   | Baseline    | Calculated |
+
+## Section E: Interactive Graphs
+
+Create six visualizations.
+
+**Graph 1:** Brute Force vs. Heuristic Execution Time
+
+**Graph 2:** Number of Candidate Comparisons
+
+**Graph 3:** Weighted Attribute Similarity Breakdown
+
+**Graph 4:** Top-K Match Ranking
+
+**Graph 5:** Lost and Found Category Distribution
+
+**Graph 6:** Matching Decision Tree
+
+Example decision tree:
+
+Selected Lost Report
+→ Validate Report
+→ Filter Candidates
+→ Check Compatibility
+→ Calculate Similarity
+→ Rank Results
+→ Return Top-K
+
+Use Graphviz, React Flow, or a lightweight SVG implementation.
+
+The visualization must reflect actual algorithm execution.
+
+## Section F: Syllabus Mapping
+
+Show all eight syllabus topics.
+
+Explain where each topic is implemented.
+
+---
+
+# 16. DEMO DATASETS
+
+Provide reproducible datasets.
+
+### Dataset 1: Exact Matches
+
+Items with identical attributes.
+
+Expected: Very high similarity.
+
+### Dataset 2: Partial Matches
+
+Items with some matching and some different attributes.
+
+Expected: Moderate similarity.
+
+### Dataset 3: Missing Information
+
+Reports with missing optional fields.
+
+Expected: Safe handling and appropriate evidence coverage.
+
+### Dataset 4: No Matches
+
+No eligible found reports.
+
+Expected: Empty recommendations.
+
+### Dataset 5: Large Dataset
+
+Generate:
+
+* 100 reports
+* 500 reports
+* 1,000 reports
+
+Expected: Successful execution and performance comparison.
+
+### Dataset 6: Invalid and Conflicting Reports
+
+Include:
+
+* Duplicate reports
+* Resolved reports
+* Invalid dates
+* Category mismatches
+* Equal similarity scores
+
+Expected: Correct validation and deterministic results.
+
+### Dataset 7: Filtering Trade-Off
+
+Include a relevant match with an incorrectly labelled category.
+
+Expected: Brute force can find the candidate while strict category filtering may exclude it.
+
+Demonstrate the trade-off clearly.
+
+Provide a "Load Demo Dataset" button.
+
+Loading demo data must not silently delete existing user reports.
+
+Use isolated experiment datasets or require explicit confirmation before resetting demo records.
+
+---
+
+# 17. BACKEND API ENDPOINTS
+
+Implement FastAPI endpoints.
+
+```text
+POST   /api/auth/register
+POST   /api/auth/login
+
+POST   /api/items/lost
+POST   /api/items/found
+
+GET    /api/items
+GET    /api/items/{id}
+
+POST   /api/match/brute-force
+POST   /api/match/heuristic
+POST   /api/match/compare
+
+POST   /api/ai/analyze
+
+POST   /api/claims
+GET    /api/claims
+PATCH  /api/claims/{id}
+
+GET    /api/dashboard/stats
+
+POST   /api/experiments/run
+GET    /api/experiments/results
+```
+
+Use Pydantic for request validation.
+
+Return consistent JSON responses.
+
+Handle invalid requests using appropriate HTTP status codes.
+
+FastAPI's interactive documentation must be available through `/docs`.
+
+---
+
+# 18. AUTOMATED TESTING
+
+Write Pytest tests for the core functionality.
+
+At minimum, test:
+
+1. Exact matches.
+2. Partial matches.
+3. Completely different reports.
+4. Case-insensitive comparisons.
+5. Empty descriptions.
+6. Empty sets.
+7. Jaccard similarity calculations.
+8. Weighted heuristic calculations.
+9. Weight normalization.
+10. Missing attributes.
+11. Invalid report types.
+12. Resolved report exclusion.
+13. Date compatibility.
+14. Duplicate reports.
+15. Top-K ranking.
+16. Equal-score tie-breaking.
+17. No available candidates.
+18. Brute-force comparison counts.
+19. Heuristic filtering.
+20. AI fallback without API keys.
+21. Unauthorized claim approval.
+22. Duplicate claim approval prevention.
+23. Database persistence.
+24. API validation.
+25. Similarity score bounds.
+26. Large datasets.
+
+Also test the complete user workflow:
+
+Register
+→ Login
+→ Report Lost Item
+→ Report Found Item
+→ Run Matching
+→ View Recommendations
+→ Submit Claim
+→ Admin Approval
+→ Resolve Reports
+
+Run the tests and fix failures.
+
+Do not fabricate passing test results.
+
+---
+
+# 19. PERFORMANCE METRICS
+
+The system must calculate:
+
+### 1. Execution Time
+
+Measure algorithm runtime in milliseconds.
+
+### 2. Candidate Reduction
+
+Reduction (%) = ((B - H) / B) × 100
+
+### 3. Highest Similarity Score
+
+Maximum score among eligible candidates.
+
+### 4. Average Similarity Score
+
+Average score among evaluated candidates.
+
+### 5. Number of Potential Matches
+
+Count candidates above the configured threshold.
+
+### 6. Matching Recall on Labelled Demo Data
+
+Recall = True Positives / (True Positives + False Negatives)
+
+### 7. Matching Precision on Labelled Demo Data
+
+Precision = True Positives / (True Positives + False Positives)
+
+Calculate precision and recall only when a dataset contains known ground-truth matches.
+
+For undefined denominators, display N/A rather than inventing values.
+
+Clearly distinguish heuristic similarity from actual matching accuracy.
+
+---
+
+# 20. PROJECT ARCHITECTURE
+
+Use a clean directory structure.
+
+Suggested structure:
+
+```text
+smart-lost-found/
+|
+|-- backend/
+|   |-- main.py
+|   |-- database.py
+|   |-- models.py
+|   |-- schemas.py
+|   |
+|   |-- algorithms/
+|   |   |-- pattern_matching.py
+|   |   |-- set_similarity.py
+|   |   |-- heuristic.py
+|   |   |-- brute_force.py
+|   |   |-- optimized_matching.py
+|   |   |-- ranking.py
+|   |   |-- invariants.py
+|   |
+|   |-- services/
+|   |   |-- ai_service.py
+|   |   |-- matching_service.py
+|   |   |-- claim_service.py
+|   |
+|   |-- routes/
+|   |   |-- auth.py
+|   |   |-- items.py
+|   |   |-- matching.py
+|   |   |-- experiments.py
+|   |
+|   |-- tests/
+|   |   |-- test_algorithms.py
+|   |   |-- test_api.py
+|   |   |-- test_invariants.py
+|   |
+|   |-- requirements.txt
+|
+|-- frontend/
+|   |-- src/
+|   |   |-- components/
+|   |   |-- pages/
+|   |   |-- services/
+|   |   |-- App.jsx
+|   |
+|   |-- package.json
+|
+|-- README.md
+|-- ALGORITHMS.md
+```
+
+You may adjust the structure where necessary, but keep it simple.
+
+---
+
+# 21. USER INTERFACE REQUIREMENTS
+
+Create a polished academic project dashboard.
+
+### Visual Style
+
+* White and light-gray backgrounds.
+* Blue and teal accents.
+* Modern cards.
+* Clean typography.
+* Rounded corners.
+* Subtle shadows.
+* Professional icons.
+* Responsive charts.
+* Consistent spacing.
+
+### UX Requirements
+
+* All buttons must work.
+* All forms must validate inputs.
+* Display loading states.
+* Display meaningful errors.
+* Show success notifications.
+* Use clear navigation.
+* Provide empty states.
+* Support desktop and mobile screens.
+
+The application should look professional without becoming unnecessarily complex.
+
+---
+
+# 22. POLYA'S PROBLEM-SOLVING METHOD
+
+Also include a short educational explanation of Polya's four steps.
+
+### Step 1: Understand
+
+Identify the lost and found matching problem.
+
+### Step 2: Plan
+
+Design similarity calculations and matching algorithms.
+
+### Step 3: Execute
+
+Run the Python algorithms.
+
+### Step 4: Review
+
+Compare results, evaluate performance, and identify limitations.
+
+This should be documented as the overall methodology rather than counted as a replacement for one of the eight mandatory topics.
+
+---
+
+# 23. DOCUMENTATION
+
+Generate:
+
+### README.md
+
+Include:
+
+* Introduction
+* Problem statement
+* Objectives
+* Features
+* Technology stack
+* Installation instructions
+* API overview
+* Testing instructions
+* Screenshots section placeholder
+* Limitations
+* Future scope
+
+### ALGORITHMS.md
+
+Include:
+
+* All eight syllabus topics
+* Mathematical formulas
+* Pseudocode
+* Algorithm explanations
+* Time-complexity analysis
+* Example calculations
+* Brute-force vs. heuristic comparison
+* Experimental methodology
+
+The documentation must describe the actual implemented application.
+
+Do not claim features exist if they were not implemented.
+
+---
+
+# 24. DEVELOPMENT PHASES
+
+Build the project incrementally.
+
+## Phase 1: Application Foundation
+
+Implement:
+
+* FastAPI backend
+* React frontend
+* SQLite database
+* Authentication
+* Lost/found reporting
+* Browse reports
+
+Verify that reports can be created and retrieved.
+
+## Phase 2: Mathematical Matching Engine
+
+Implement:
+
+* Pattern recognition
+* Set theory
+* Jaccard similarity
+* Weighted heuristic scoring
+* Conditional statements
+* Brute-force matching
+* Optimized heuristic matching
+* Extreme Principle
+* Invariants
+
+Write and execute unit tests.
+
+## Phase 3: Algorithm Lab
+
+Implement:
+
+* Algorithm comparison
+* Performance metrics
+* Mathematical explanations
+* Interactive graphs
+* Top-K visualization
+* Search-tree visualization
+* Demo datasets
+
+Verify all displayed values against backend calculations.
+
+## Phase 4: AI and Ownership Verification
+
+Implement:
+
+* Prompt-based description extraction
+* Rule-based fallback
+* Ownership claims
+* Admin verification
+* Report resolution
+
+Test the complete workflow.
+
+## Phase 5: Final Testing and Polish
+
+* Run all automated tests.
+* Fix failing tests.
+* Verify API endpoints.
+* Verify React-to-FastAPI communication.
+* Verify database persistence.
+* Verify all graphs.
+* Verify all eight syllabus topics.
+* Ensure the Replit preview works.
+* Complete documentation.
+
+---
+
+# 25. DEFINITION OF DONE
+
+The project is complete only when:
+
+1. The React frontend runs successfully.
+2. The Python FastAPI backend runs successfully.
+3. SQLite stores reports persistently.
+4. Users can report lost and found items.
+5. The matching engine returns meaningful results.
+6. Pattern recognition works.
+7. Set theory and Jaccard similarity work.
+8. Weighted heuristic scoring works.
+9. Brute-force matching works.
+10. Optimized heuristic matching works.
+11. Conditional constraints are enforced.
+12. Top-K ranking works.
+13. Invariants are enforced.
+14. Prompt-based description extraction works.
+15. The rule-based AI fallback works without API keys.
+16. Algorithm comparison graphs display actual results.
+17. Search-tree visualization works.
+18. Ownership verification works.
+19. Demo datasets work.
+20. Automated tests pass.
+21. All eight syllabus topics are demonstrable.
+22. The application runs correctly in Replit.
+
+---
+
+# FINAL INSTRUCTIONS
+
+Build this as a **complete, working MCA Problem Solving project**, not a frontend demonstration.
+
+The primary focus must be on:
+
+**Mathematical correctness + Algorithm comparison + Graphical visualization + Real-world functionality.**
+
+Use Python for all mathematical algorithms and backend processing.
+
+Use React for the user interface.
+
+Keep the project understandable and avoid unnecessary complexity.
+
+Do not fabricate performance results.
+
+Do not skip testing.
+
+Do not leave placeholder functionality.
+
+Work incrementally, verify each phase, and fix errors before proceeding.
+
+At completion, provide:
+
+1. A summary of implemented features.
+2. A list of implemented syllabus topics.
+3. Automated test results.
+4. Instructions for running the application.
+5. Any remaining limitations.
+
+**Begin building the Smart Lost & Found Matcher now.**

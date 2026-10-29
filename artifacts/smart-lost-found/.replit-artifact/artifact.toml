@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Smart Lost & Found Matcher"
+description = "A working lost-and-found platform with a Python matching engine, explainable similarity scores, ownership claims, and an algorithm analysis lab for demonstrating mathematical problem solving."
+version = "1.0.0"
+id = "artifacts/smart-lost-found"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18702
+
+[services.development]
+run = "pnpm --filter @workspace/smart-lost-found run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/smart-lost-found", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/smart-lost-found/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18702"
+BASE_PATH = "/"
